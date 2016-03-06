@@ -1,7 +1,7 @@
 Code.load_file("priority-queue.exs")
 
 ExUnit.start
-ExUnit.configure(exclude: [:takeMin, :enqueue, :peekMin],
+ExUnit.configure(exclude: [],
                  include: :last,
                  trace: true)
 
@@ -57,16 +57,18 @@ defmodule PriorityQueueTest do
 
   @tag :last
   test "it takes in a bunch of values and spits them out sorted" do
-    randos = 1..40
-    |> Enum.into([], fn (r)-> :random.uniform(100) end)
-    IO.inspect randos
+    randos = 1..1000
+    |> Enum.into([], fn (r)-> :random.uniform(10000) end)
     Enum.each(randos, &PriorityQueue.enqueue(&1))
-    IO.inspect PriorityQueue.state()
     popped_off_queue = Enum.map(randos, fn (r)->
-      IO.inspect(PriorityQueue.takeMin())
-    end)
-    IO.inspect(Enum.sort(randos))
+      PriorityQueue.takeMin()
+    end
+    )
     assert Enum.sort(randos) == popped_off_queue
+  end
+
+  test "bubble down returns tuple of there are no children" do
+    assert(PriorityQueue.bubble_down({3,1,2},1) == {3,1,2})
   end
 
   @tag :takeMin
