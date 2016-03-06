@@ -1,8 +1,8 @@
 Code.load_file("priority-queue.exs")
 
 ExUnit.start
-ExUnit.configure(exclude: [],
-                 include: :takeMin,
+ExUnit.configure(exclude: [:takeMin, :enqueue, :peekMin],
+                 include: :last,
                  trace: true)
 
 defmodule PriorityQueueTest do
@@ -50,12 +50,26 @@ defmodule PriorityQueueTest do
     PriorityQueue.enqueue(50)
     PriorityQueue.enqueue(4)
     PriorityQueue.enqueue(45)
-    PriorityQueue.enqueue(45)
     PriorityQueue.enqueue(4)
     PriorityQueue.takeMin()
     assert PriorityQueue.peekMin() == 4
   end
 
+  @tag :last
+  test "it takes in a bunch of values and spits them out sorted" do
+    randos = 1..40
+    |> Enum.into([], fn (r)-> :random.uniform(100) end)
+    IO.inspect randos
+    Enum.each(randos, &PriorityQueue.enqueue(&1))
+    IO.inspect PriorityQueue.state()
+    popped_off_queue = Enum.map(randos, fn (r)->
+      IO.inspect(PriorityQueue.takeMin())
+    end)
+    IO.inspect(Enum.sort(randos))
+    assert Enum.sort(randos) == popped_off_queue
+  end
+
+  @tag :takeMin
   test 'swapping values' do
     tuple = {1,2,3}
     tuple2 = PriorityQueue.swap_values(
