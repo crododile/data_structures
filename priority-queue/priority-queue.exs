@@ -36,7 +36,7 @@ defmodule PriorityQueue do
   end
   defp bubble_down(tuple, current_index) do
     current_value = elem(tuple, current_index)
-    swap_index = find_bubble_down_swap_index(tuple, current_index)
+    swap_index = find_largest_child(tuple, current_index)
 
     if elem(tuple, swap_index) < current_value do
       swap_values(tuple, current_index, swap_index)
@@ -46,7 +46,7 @@ defmodule PriorityQueue do
     end
   end
 
-  defp find_bubble_down_swap_index(tuple, parent_index) do
+  defp find_largest_child(tuple, parent_index) do
     left_child_index = parent_index * 2 + 1
     right_child_index = left_child_index + 1
     cond do
