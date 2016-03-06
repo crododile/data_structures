@@ -23,35 +23,41 @@ defmodule PriorityQueue do
 
   defp removeMin(tuple) do
     last_index = tuple_size(tuple) - 1
-    last = elem(tuple, last_index)
     tuple
+    |> swap_values(last_index, 0)
     |> Tuple.delete_at(last_index)
-    |> Tuple.delete_at(0)
-    |> Tuple.insert_at(0, last)
     |> bubble_down
   end
 
-  defp bubble_down(tuple) do
-    bubble_down(tuple, 0)
+  defp bubble_down(tuple), do: bubble_down(tuple, 0)
+  defp bubble_down(tuple, current_index) when tuple_size(tuple) <= (current_index * 2) do
+    # no children
+    tuple
   end
-
   defp bubble_down(tuple, current_index) do
-    left_child_index = current_index * 2 + 1
-    right_child_index = left_child_index + 1
-    last_index = tuple_size(tuple) - 1
     current_value = elem(tuple, current_index)
-    swap_index = left_child_index
+    swap_index = find_bubble_down_swap_index(tuple, current_index)
 
-    if last_index >= right_child_index do
-      if elem(tuple, right_child_index) < elem(tuple, left_child_index) do
-        swap_index = right_child_index
-      end
-    end
-    if last_index >= swap_index && elem(tuple, swap_index) < current_value do
+    if elem(tuple, swap_index) < current_value do
       swap_values(tuple, current_index, swap_index)
       |> bubble_down(swap_index)
     else
       tuple
+    end
+  end
+
+  defp find_bubble_down_swap_index(tuple, parent_index) do
+    left_child_index = parent_index * 2 + 1
+    right_child_index = left_child_index + 1
+    cond do
+      # no right child
+      tuple_size(tuple) <= right_child_index ->
+        left_child_index
+      # left < right
+      elem(tuple, left_child_index) <= elem(tuple, right_child_index) ->
+          left_child_index
+      # else..
+      true -> right_child_index
     end
   end
 
@@ -81,9 +87,7 @@ defmodule PriorityQueue do
 
   defp bubble_up(tuple, index) do
     parent_index = div(index, 2)
-    item = elem(tuple, index)
-    parent = elem(tuple, parent_index)
-    if item < parent do
+    if elem(tuple, index) < elem(tuple, parent_index) do
       tuple
       |> swap_values(index, parent_index)
       |> bubble_up(parent_index)
@@ -92,12 +96,6 @@ defmodule PriorityQueue do
     end
   end
 
-  defp peekMin(tuple) do
-    if tuple_size(tuple) == 0 do
-      nil
-    else
-      elem(tuple, 0)
-    end
-  end
-
+  defp peekMin(tuple) when tuple_size(tuple) == 0, do: nil
+  defp peekMin(tuple), do: elem(tuple, 0)
 end
